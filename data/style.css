@@ -1,0 +1,90 @@
+
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+        text-align: center;
+        margin: 0px auto;
+        padding-top: 30px;
+    }
+
+    button {
+        margin: 10px;
+        display: inline-block;
+        border: 0;
+        background: #222;
+        color: #666;
+        font-weight: 600;
+        font-size: 2em;
+        outline: none;
+        border-bottom: 0.1em solid rgba(0, 0, 0, 0.5);
+        border-radius: 0.2em;
+        cursor: pointer;
+    }
+
+    .button-axes {
+        width: 1.6em;
+        height: 1.6em;
+        line-height: 1.3;
+    }
+
+    .button-play {
+        font-size: 1.5em;
+        padding:.5em;
+        color: #999999;
+    }
+
+    button.active,
+    button:active {
+        border-bottom: 0.15em solid transparent;
+        transform: scale(0.9);
+    }
+
+    button .arrow {
+        display: inline-block;
+        width: 0;
+        height: 0;
+        vertical-align: middle;
+        font-size: 0.35em;
+        line-height: 0;
+        border: 0 solid transparent;
+        color: inherit;
+    }
+
+    button .arrow-left {
+        border-right-color: #999;
+        border-right-width: 1em;
+        border-bottom-width: 1em;
+        border-top-width: 1em;
+        margin-left: -0.25em;
+    }
+
+    button .arrow-right {
+        border-left-color: #999;
+        border-left-width: 1em;
+        border-bottom-width: 1em;
+        border-top-width: 1em;
+        margin-right: -0.25em;
+    }
+
+    button .arrow-up {
+        border-bottom-color: #999;
+        border-bottom-width: 1em;
+        border-left-width: 1em;
+        border-right-width: 1em;
+        margin-top: -0.25em;
+    }
+
+    button .arrow-down {
+        border-top-color: #999;
+        border-top-width: 1em;
+        border-left-width: 1em;
+        border-right-width: 1em;
+        margin-bottom: -0.25em;
+    }
+
+    #blockly-area {
+        margin-left: auto;
+        margin-right: auto;
+        height: 480px;
+        width: 600px;
+    }
+

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title> Web Server Motor Control Test </title>
+  <script src="https://unpkg.com/blockly/blockly.min.js"></script>
+  <style>
+
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+          text-align: center;
+          margin: 0px auto;
+          padding-top: 30px;
+      }
+
+      button {
+          margin: 10px;
+          display: inline-block;
+          border: 0;
+          background: #222;
+          color: #666;
+          font-weight: 600;
+          font-size: 2em;
+          outline: none;
+          border-bottom: 0.1em solid rgba(0, 0, 0, 0.5);
+          border-radius: 0.2em;
+          cursor: pointer;
+      }
+
+      .button-axes {
+          width: 1.6em;
+          height: 1.6em;
+          line-height: 1.3;
+      }
+
+      .button-play {
+          font-size: 1.5em;
+          padding:.5em;
+          color: #999999;
+      }
+
+      button.active,
+      button:active {
+          border-bottom: 0.15em solid transparent;
+          transform: scale(0.9);
+      }
+
+      button .arrow {
+          display: inline-block;
+          width: 0;
+          height: 0;
+          vertical-align: middle;
+          font-size: 0.35em;
+          line-height: 0;
+          border: 0 solid transparent;
+          color: inherit;
+      }
+
+      button .arrow-left {
+          border-right-color: #999;
+          border-right-width: 1em;
+          border-bottom-width: 1em;
+          border-top-width: 1em;
+          margin-left: -0.25em;
+      }
+
+      button .arrow-right {
+          border-left-color: #999;
+          border-left-width: 1em;
+          border-bottom-width: 1em;
+          border-top-width: 1em;
+          margin-right: -0.25em;
+      }
+
+      button .arrow-up {
+          border-bottom-color: #999;
+          border-bottom-width: 1em;
+          border-left-width: 1em;
+          border-right-width: 1em;
+          margin-top: -0.25em;
+      }
+
+      button .arrow-down {
+          border-top-color: #999;
+          border-top-width: 1em;
+          border-left-width: 1em;
+          border-right-width: 1em;
+          margin-bottom: -0.25em;
+      }
+
+      #blockly-area {
+          margin-left: auto;
+          margin-right: auto;
+          height: 480px;
+          width: 600px;
+      }
+
+
+  </style>
+
+</head>
+<body>
+
+<h2>Direct Motor Control</h2>
+
+<div>
+  <p>Use the buttons or arrow keys send commands to the motors.</p>
+</div>
+
+
+<div>
+  <button class="button-axes" data-direction="F">
+    <i class="arrow arrow-up"></i>
+  </button>
+</div>
+<div>
+  <button class="button-axes" data-direction="L">
+    <i class="arrow arrow-left"></i>
+  </button>
+  <button class="button-axes" data-direction="B">
+    <i class="arrow arrow-down"></i>
+  </button>
+  <button class="button-axes" data-direction="R">
+    <i class="arrow arrow-right"></i>
+  </button>
+</div>
+
+<hr>
+
+<h2>Program Motor Control</h2>
+
+<div>
+  <p>Add commands by dragging them to the right, then press play to execute the commands.</p>
+</div>
+
+
+<div id="blockly-area"></div>
+
+<button id="blockly-play-button" class="button-play">PLAY</button>
+
+
+<script type="text/javascript">
+
+    // Global color option
+    Blockly.HSV_SATURATION = 1;
+
+    // Define the move block
+    Blockly.Blocks['move'] = {
+        init: function() {
+            this.setColour('%{BKY_PROCEDURES_HUE}');
+            this.appendDummyInput()
+                .appendField("Move")
+                .appendField(new Blockly.FieldDropdown([["Forward", "F"], ["Backward", "B"], ["Left", "L"], ["Right", "R"]]), "MOVE_DIRECTION");
+            this.setPreviousStatement(true, "null");
+            this.setNextStatement(true, "null");
+            this.setTooltip('');
+        }
+    };
+
+    // Define the stop block
+    Blockly.Blocks['stop'] = {
+        init: function() {
+            this.appendDummyInput()
+                .appendField("Stop")
+            this.setColour('%{BKY_PROCEDURES_HUE}');
+            this.setPreviousStatement(true, "null");
+            this.setTooltip('');
+        }
+    };
+
+    // Define toolbox blocks
+    var myToolbox = {
+        "kind": "flyoutToolbox",
+        "contents": [
+            {
+                "kind": "block",
+                "blockxml": "<block type='move'><field name='MOVE_DIRECTION'>F</field></block>"
+            },
+            {
+                "kind": "block",
+                "blockxml": "<block type='move'><field name='MOVE_DIRECTION'>B</field></block>"
+            },
+            {
+                "kind": "block",
+                "blockxml": "<block type='move'><field name='MOVE_DIRECTION'>L</field></block>"
+            },
+            {
+                "kind": "block",
+                "blockxml": "<block type='move'><field name='MOVE_DIRECTION'>R</field></block>"
+            },
+            {
+                "kind": "block",
+                "type": "stop"
+            }
+        ]
+    };
+
+    // Define the move action javascript code generation
+    Blockly.JavaScript['move'] = function(block) {
+        var dropdown_direction = block.getFieldValue('MOVE_DIRECTION');
+        var code = 'doAction(\'move\',{\'direction\':\'' + dropdown_direction + '\'});\n';
+        console.log('running', code);
+        return code;
+    };
+
+    // Define the stop action javascript code generation
+    Blockly.JavaScript['stop'] = function(block) {
+        var code = 'doAction(\'stop\');\n';
+        console.log('running', code);
+        return code;
+    };
+
+    // Create the blockly instance and inject it into the doom
+    var workspace = Blockly.inject('blockly-area',
+        {toolbox: myToolbox});
+
+    // Event listener to play blockly code and eval it.
+    var blocklyPlayButton = document.getElementById('blockly-play-button').addEventListener('click', function(event) {
+        Blockly.JavaScript.addReservedWords('code');
+        var code = Blockly.JavaScript.workspaceToCode(workspace);
+
+        try {
+            // maybe do https://stackoverflow.com/a/66149020/167827
+            eval(code);
+        } catch (e) {
+            alert(e);
+        }
+
+    });
+
+    var sendCommand = true;
+
+    // Event Listeners
+    var buttons = document.querySelectorAll('.button-axes');
+    [...buttons].forEach((button) => {
+        button.addEventListener("mousedown", (evt) => doAction('move', {'direction': event.currentTarget.dataset.direction}));
+        button.addEventListener("mouseup", (evt) => doAction('stop'));
+        button.addEventListener("touchstart", (evt) => doAction('move', {'direction': event.currentTarget.dataset.direction}));
+        button.addEventListener("touchend", (evt) => doAction('stop'));
+    });
+
+    // Key Pressed
+    document.addEventListener("keydown", function(evt) {
+        if (evt.keyCode == "38" && sendCommand) {   // up arrow
+            doAction('move', {'direction': 'F'});
+            sendCommand = false;
+        } else if (evt.keyCode == "40" && sendCommand) {  // down arrow
+            doAction('move', {'direction': 'B'});
+            sendCommand = false;
+        } else if (evt.keyCode == "37" && sendCommand) {  // left arrow
+            doAction('move', {'direction': 'L'});
+            sendCommand = false;
+        } else if (evt.keyCode == "39" && sendCommand) {  // right arrow
+            doAction('move', {'direction': 'R'});
+            sendCommand = false;
+        }
+    });
+
+    // Key Released
+    document.addEventListener("keyup", function(evt) {
+        if (evt.keyCode == "37" || evt.keyCode == "38" || evt.keyCode == "39" || evt.keyCode == "40") {
+            doAction('stop');
+            sendCommand = true;
+        }
+    });
+
+    // Event Listener
+    function doAction(action, params) {
+        if (action == "move") {
+            execute(params.direction)
+        }
+        if (action == "stop") {
+            execute("S")
+        }
+    }
+
+    // Execute to robot
+    function execute(command) {
+        console.log("sending: " + command);
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "/" + command, true);
+        xhr.send();
+    }
+</script>
+</body>
+</html>
